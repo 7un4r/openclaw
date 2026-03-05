@@ -85,5 +85,21 @@ if (await tryImport("./dist/entry.js")) {
 } else if (await tryImport("./dist/entry.mjs")) {
   // OK
 } else {
-  throw new Error("nightclaw: missing dist/entry.(m)js (build output).");
+  // Fallback: run directly from TypeScript source via jiti.
+  // This activates when installed via `npm install -g github:r1skarctic/nightclaw`
+  // (where no build step runs and dist/ is absent). jiti is listed in
+  // `dependencies` so it is always installed alongside the package.
+  try {
+    const { createJiti } = await import("jiti");
+    const jiti = createJiti(import.meta.url);
+    await jiti.import("./src/entry.ts");
+  } catch (err) {
+    if (isModuleNotFoundError(err)) {
+      throw new Error(
+        "nightclaw: missing dist/entry.(m)js (build output) and jiti is unavailable. " +
+          "Run `pnpm install && pnpm build` to build the project first.",
+      );
+    }
+    throw err;
+  }
 }

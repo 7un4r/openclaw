@@ -244,7 +244,10 @@ export async function resolveGlobalManager(params: {
 }
 
 export async function tryWriteCompletionCache(root: string, jsonMode: boolean): Promise<void> {
-  const binPath = path.join(root, "openclaw.mjs");
+  const binPath =
+    (await pathExists(path.join(root, "nightclaw.mjs")))
+      ? path.join(root, "nightclaw.mjs")
+      : path.join(root, "openclaw.mjs");
   if (!(await pathExists(binPath))) {
     return;
   }

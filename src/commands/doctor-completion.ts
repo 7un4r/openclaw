@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import fs from "node:fs";
 import path from "node:path";
 import { resolveCliName } from "../cli/cli-name.js";
 import {
@@ -27,7 +28,9 @@ async function generateCompletionCache(): Promise<boolean> {
     return false;
   }
 
-  const binPath = path.join(root, "openclaw.mjs");
+  const binPath = fs.existsSync(path.join(root, "nightclaw.mjs"))
+    ? path.join(root, "nightclaw.mjs")
+    : path.join(root, "openclaw.mjs");
   const result = spawnSync(process.execPath, [binPath, "completion", "--write-state"], {
     cwd: root,
     env: process.env,
