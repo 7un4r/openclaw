@@ -52,8 +52,8 @@ Model note: while many providers/models are supported, for the best experience a
 Runtime: **Node ≥22**.
 
 ```bash
-npm install -g nightclaw@latest
-# or: pnpm add -g nightclaw@latest
+npm install -g github:r1skarctic/nightclaw
+# or: pnpm add -g github:r1skarctic/nightclaw
 
 nightclaw onboard --install-daemon
 ```
@@ -94,7 +94,7 @@ Details: [Development channels](https://docs.openclaw.ai/install/development-cha
 Prefer `pnpm` for builds from source. Bun is optional for running TypeScript directly.
 
 ```bash
-git clone https://github.com/r1skarctic/openclaw.git
+git clone https://github.com/r1skarctic/nightclaw.git
 cd nightclaw
 
 pnpm install

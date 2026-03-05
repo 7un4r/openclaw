@@ -117,7 +117,7 @@ with email auth.
 ## Updating
 
 ```bash
-npm i -g openclaw@latest
+npm install -g github:r1skarctic/nightclaw
 openclaw doctor
 openclaw gateway restart
 openclaw health
