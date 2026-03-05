@@ -177,7 +177,7 @@ export async function promptGatewayConfig(
           {
             value: "plaintext",
             label: "Generate/store plaintext token",
-            hint: "Default and backwards-compatible",
+            hint: "Default",
           },
           {
             value: "ref",

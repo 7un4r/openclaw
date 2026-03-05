@@ -174,7 +174,7 @@ export async function configureGatewayForOnboarding(
             copy: {
               modeMessage: "How do you want to provide the gateway token?",
               plaintextLabel: "Generate/store plaintext token",
-              plaintextHint: "Default and backwards-compatible",
+              plaintextHint: "Default",
               refLabel: "Use SecretRef",
               refHint: "Store a reference instead of plaintext",
             },
