@@ -1,5 +1,5 @@
 ---
-summary: "OpenClaw CLI reference for `openclaw` commands, subcommands, and options"
+summary: "NightClaw CLI reference for `openclaw` commands, subcommands, and options"
 read_when:
   - Adding or modifying CLI commands or options
   - Documenting new command surfaces
@@ -76,12 +76,12 @@ This page describes the current CLI behavior. If commands change, update this do
 
 ## Color palette
 
-OpenClaw uses a lobster palette for CLI output.
+NightClaw uses a dark purple palette for CLI output.
 
-- `accent` (#FF5A2D): headings, labels, primary highlights.
-- `accentBright` (#FF7A3D): command names, emphasis.
-- `accentDim` (#D14A22): secondary highlight text.
-- `info` (#FF8A5B): informational values.
+- `accent` (#4b0090): headings, labels, primary highlights.
+- `accentBright` (#6a00cc): command names, emphasis.
+- `accentDim` (#360068): secondary highlight text.
+- `info` (#8533ff): informational values.
 - `success` (#2FBF71): success states.
 - `warn` (#FFB020): warnings, fallbacks, attention.
 - `error` (#E23D2D): errors, failures.

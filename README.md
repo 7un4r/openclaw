@@ -1,4 +1,4 @@
-# 🦞 OpenClaw — Personal AI Assistant
+# 🌑 NightClaw — Personal AI Assistant
 
 <p align="center">
     <picture>
@@ -12,20 +12,20 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/openclaw/openclaw/actions/workflows/ci.yml?branch=main"><img src="https://img.shields.io/github/actions/workflow/status/openclaw/openclaw/ci.yml?branch=main&style=for-the-badge" alt="CI status"></a>
-  <a href="https://github.com/openclaw/openclaw/releases"><img src="https://img.shields.io/github/v/release/openclaw/openclaw?include_prereleases&style=for-the-badge" alt="GitHub release"></a>
+  <a href="https://github.com/r1skarctic/openclaw/actions/workflows/ci.yml?branch=main"><img src="https://img.shields.io/github/actions/workflow/status/r1skarctic/openclaw/ci.yml?branch=main&style=for-the-badge" alt="CI status"></a>
+  <a href="https://github.com/r1skarctic/openclaw/releases"><img src="https://img.shields.io/github/v/release/r1skarctic/openclaw?include_prereleases&style=for-the-badge" alt="GitHub release"></a>
   <a href="https://discord.gg/clawd"><img src="https://img.shields.io/discord/1456350064065904867?label=Discord&logo=discord&logoColor=white&color=5865F2&style=for-the-badge" alt="Discord"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
 </p>
 
-**OpenClaw** is a _personal AI assistant_ you run on your own devices.
+**NightClaw** is a _personal AI assistant_ you run on your own devices.
 It answers you on the channels you already use (WhatsApp, Telegram, Slack, Discord, Google Chat, Signal, iMessage, BlueBubbles, IRC, Microsoft Teams, Matrix, Feishu, LINE, Mattermost, Nextcloud Talk, Nostr, Synology Chat, Tlon, Twitch, Zalo, Zalo Personal, WebChat). It can speak and listen on macOS/iOS/Android, and can render a live Canvas you control. The Gateway is just the control plane — the product is the assistant.
 
 If you want a personal, single-user assistant that feels local, fast, and always-on, this is it.
 
 [Website](https://openclaw.ai) · [Docs](https://docs.openclaw.ai) · [Vision](VISION.md) · [DeepWiki](https://deepwiki.com/openclaw/openclaw) · [Getting Started](https://docs.openclaw.ai/start/getting-started) · [Updating](https://docs.openclaw.ai/install/updating) · [Showcase](https://docs.openclaw.ai/start/showcase) · [FAQ](https://docs.openclaw.ai/help/faq) · [Wizard](https://docs.openclaw.ai/start/wizard) · [Nix](https://github.com/openclaw/nix-openclaw) · [Docker](https://docs.openclaw.ai/install/docker) · [Discord](https://discord.gg/clawd)
 
-Preferred setup: run the onboarding wizard (`openclaw onboard`) in your terminal.
+Preferred setup: run the onboarding wizard (`nightclaw onboard`) in your terminal.
 The wizard guides you step by step through setting up the gateway, workspace, channels, and skills. The CLI wizard is the recommended path and works on **macOS, Linux, and Windows (via WSL2; strongly recommended)**.
 Works with npm, pnpm, or bun.
 New install? Start here: [Getting started](https://docs.openclaw.ai/start/getting-started)
@@ -52,10 +52,10 @@ Model note: while many providers/models are supported, for the best experience a
 Runtime: **Node ≥22**.
 
 ```bash
-npm install -g openclaw@latest
-# or: pnpm add -g openclaw@latest
+npm install -g nightclaw@latest
+# or: pnpm add -g nightclaw@latest
 
-openclaw onboard --install-daemon
+nightclaw onboard --install-daemon
 ```
 
 The wizard installs the Gateway daemon (launchd/systemd user service) so it stays running.
@@ -67,18 +67,18 @@ Runtime: **Node ≥22**.
 Full beginner guide (auth, pairing, channels): [Getting started](https://docs.openclaw.ai/start/getting-started)
 
 ```bash
-openclaw onboard --install-daemon
+nightclaw onboard --install-daemon
 
-openclaw gateway --port 18789 --verbose
+nightclaw gateway --port 18789 --verbose
 
 # Send a message
-openclaw message send --to +1234567890 --message "Hello from OpenClaw"
+nightclaw message send --to +1234567890 --message "Hello from NightClaw"
 
 # Talk to the assistant (optionally deliver back to any connected channel: WhatsApp/Telegram/Slack/Discord/Google Chat/Signal/iMessage/BlueBubbles/IRC/Microsoft Teams/Matrix/Feishu/LINE/Mattermost/Nextcloud Talk/Nostr/Synology Chat/Tlon/Twitch/Zalo/Zalo Personal/WebChat)
-openclaw agent --message "Ship checklist" --thinking high
+nightclaw agent --message "Ship checklist" --thinking high
 ```
 
-Upgrading? [Updating guide](https://docs.openclaw.ai/install/updating) (and run `openclaw doctor`).
+Upgrading? [Updating guide](https://docs.openclaw.ai/install/updating) (and run `nightclaw doctor`).
 
 ## Development channels
 
@@ -86,7 +86,7 @@ Upgrading? [Updating guide](https://docs.openclaw.ai/install/updating) (and run 
 - **beta**: prerelease tags (`vYYYY.M.D-beta.N`), npm dist-tag `beta` (macOS app may be missing).
 - **dev**: moving head of `main`, npm dist-tag `dev` (when published).
 
-Switch channels (git + npm): `openclaw update --channel stable|beta|dev`.
+Switch channels (git + npm): `nightclaw update --channel stable|beta|dev`.
 Details: [Development channels](https://docs.openclaw.ai/install/development-channels).
 
 ## From source (development)
@@ -95,33 +95,33 @@ Prefer `pnpm` for builds from source. Bun is optional for running TypeScript dir
 
 ```bash
 git clone https://github.com/openclaw/openclaw.git
-cd openclaw
+cd nightclaw
 
 pnpm install
 pnpm ui:build # auto-installs UI deps on first run
 pnpm build
 
-pnpm openclaw onboard --install-daemon
+pnpm nightclaw onboard --install-daemon
 
 # Dev loop (auto-reload on TS changes)
 pnpm gateway:watch
 ```
 
-Note: `pnpm openclaw ...` runs TypeScript directly (via `tsx`). `pnpm build` produces `dist/` for running via Node / the packaged `openclaw` binary.
+Note: `pnpm nightclaw ...` runs TypeScript directly (via `tsx`). `pnpm build` produces `dist/` for running via Node / the packaged `nightclaw` binary.
 
 ## Security defaults (DM access)
 
-OpenClaw connects to real messaging surfaces. Treat inbound DMs as **untrusted input**.
+NightClaw connects to real messaging surfaces. Treat inbound DMs as **untrusted input**.
 
 Full security guide: [Security](https://docs.openclaw.ai/gateway/security)
 
 Default behavior on Telegram/WhatsApp/Signal/iMessage/Microsoft Teams/Discord/Google Chat/Slack:
 
 - **DM pairing** (`dmPolicy="pairing"` / `channels.discord.dmPolicy="pairing"` / `channels.slack.dmPolicy="pairing"`; legacy: `channels.discord.dm.policy`, `channels.slack.dm.policy`): unknown senders receive a short pairing code and the bot does not process their message.
-- Approve with: `openclaw pairing approve <channel> <code>` (then the sender is added to a local allowlist store).
+- Approve with: `nightclaw pairing approve <channel> <code>` (then the sender is added to a local allowlist store).
 - Public inbound DMs require an explicit opt-in: set `dmPolicy="open"` and include `"*"` in the channel allowlist (`allowFrom` / `channels.discord.allowFrom` / `channels.slack.allowFrom`; legacy: `channels.discord.dm.allowFrom`, `channels.slack.dm.allowFrom`).
 
-Run `openclaw doctor` to surface risky/misconfigured DM policies.
+Run `nightclaw doctor` to surface risky/misconfigured DM policies.
 
 ## Highlights
 
@@ -195,7 +195,7 @@ WhatsApp / Telegram / Slack / Discord / Google Chat / Signal / iMessage / BlueBu
 └──────────────┬────────────────┘
                │
                ├─ Pi agent (RPC)
-               ├─ CLI (openclaw …)
+               ├─ CLI (nightclaw …)
                ├─ WebChat UI
                ├─ macOS app
                └─ iOS / Android nodes
@@ -212,7 +212,7 @@ WhatsApp / Telegram / Slack / Discord / Google Chat / Signal / iMessage / BlueBu
 
 ## Tailscale access (Gateway dashboard)
 
-OpenClaw can auto-configure Tailscale **Serve** (tailnet-only) or **Funnel** (public) while the Gateway stays bound to loopback. Configure `gateway.tailscale.mode`:
+NightClaw can auto-configure Tailscale **Serve** (tailnet-only) or **Funnel** (public) while the Gateway stays bound to loopback. Configure `gateway.tailscale.mode`:
 
 - `off`: no Tailscale automation (default).
 - `serve`: tailnet-only HTTPS via `tailscale serve` (uses Tailscale identity headers by default).
@@ -220,7 +220,7 @@ OpenClaw can auto-configure Tailscale **Serve** (tailnet-only) or **Funnel** (pu
 
 Notes:
 
-- `gateway.bind` must stay `loopback` when Serve/Funnel is enabled (OpenClaw enforces this).
+- `gateway.bind` must stay `loopback` when Serve/Funnel is enabled (NightClaw enforces this).
 - Serve can be forced to require a password by setting `gateway.auth.mode: "password"` or `gateway.auth.allowTailscale: false`.
 - Funnel refuses to start unless `gateway.auth.mode: "password"` is set.
 - Optional: `gateway.tailscale.resetOnExit` to undo Serve/Funnel on shutdown.
@@ -286,7 +286,7 @@ The Gateway alone delivers a great experience. All apps are optional and add ext
 
 If you plan to build/run companion apps, follow the platform runbooks below.
 
-### macOS (OpenClaw.app) (optional)
+### macOS (NightClaw.app) (optional)
 
 - Menu bar control for the Gateway and health.
 - Voice Wake + push-to-talk overlay.
@@ -299,13 +299,13 @@ Note: signed builds required for macOS permissions to stick across rebuilds (see
 
 - Pairs as a node over the Gateway WebSocket (device pairing).
 - Voice trigger forwarding + Canvas surface.
-- Controlled via `openclaw nodes …`.
+- Controlled via `nightclaw nodes …`.
 
 Runbook: [iOS connect](https://docs.openclaw.ai/platforms/ios).
 
 ### Android node (optional)
 
-- Pairs as a WS node via device pairing (`openclaw devices ...`).
+- Pairs as a WS node via device pairing (`nightclaw devices ...`).
 - Exposes Connect/Chat/Voice tabs plus Canvas, Camera, Screen capture, and Android device command families.
 - Runbook: [Android connect](https://docs.openclaw.ai/platforms/android).
 
@@ -339,7 +339,7 @@ Details: [Security guide](https://docs.openclaw.ai/gateway/security) · [Docker 
 
 ### [WhatsApp](https://docs.openclaw.ai/channels/whatsapp)
 
-- Link the device: `pnpm openclaw channels login` (stores creds in `~/.openclaw/credentials`).
+- Link the device: `pnpm nightclaw channels login` (stores creds in `~/.openclaw/credentials`).
 - Allowlist who can talk to the assistant via `channels.whatsapp.allowFrom`.
 - If `channels.whatsapp.groups` is set, it becomes a group allowlist; include `"*"` to allow all.
 
@@ -482,7 +482,7 @@ Use these when you’re past the onboarding flow and want the deeper reference.
 
 ## Molty
 
-OpenClaw was built for **Molty**, a space lobster AI assistant. 🦞
+NightClaw is a fork of OpenClaw with features from the dark side. 🌑
 by Peter Steinberger and the community.
 
 - [openclaw.ai](https://openclaw.ai)
