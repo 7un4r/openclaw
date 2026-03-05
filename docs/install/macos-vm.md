@@ -132,13 +132,13 @@ Replace `youruser` with the account you created, and the IP with your VM's IP.
 
 ---
 
-## 6) Install OpenClaw
+## 6) Install NightClaw
 
 Inside the VM:
 
 ```bash
-npm install -g openclaw@latest
-openclaw onboard --install-daemon
+npm install -g github:r1skarctic/nightclaw
+nightclaw onboard --install-daemon
 ```
 
 Follow the onboarding prompts to set up your model provider (Anthropic, OpenAI, etc.).

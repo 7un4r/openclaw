@@ -43,7 +43,7 @@ describe("runGatewayUpdate", () => {
   beforeEach(async () => {
     tempDir = path.join(fixtureRoot, `case-${caseId++}`);
     await fs.mkdir(tempDir, { recursive: true });
-    await fs.writeFile(path.join(tempDir, "openclaw.mjs"), "export {};\n", "utf-8");
+    await fs.writeFile(path.join(tempDir, "nightclaw.mjs"), "export {};\n", "utf-8");
   });
 
   afterEach(async () => {
@@ -59,7 +59,7 @@ describe("runGatewayUpdate", () => {
     const calls: string[] = [];
     let uiBuildCount = 0;
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorKey = `${doctorNodePath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive --fix`;
+    const doctorKey = `${doctorNodePath} ${path.join(tempDir, "nightclaw.mjs")} doctor --non-interactive --fix`;
 
     const runCommand = async (argv: string[]) => {
       const key = argv.join(" ");
@@ -175,11 +175,11 @@ describe("runGatewayUpdate", () => {
     return runWithCommand(runner, options);
   }
 
-  async function seedGlobalPackageRoot(pkgRoot: string, version = "1.0.0") {
+  async function seedGlobalPackageRoot(pkgRoot: string, version = "1.0.0", name = "openclaw") {
     await fs.mkdir(pkgRoot, { recursive: true });
     await fs.writeFile(
       path.join(pkgRoot, "package.json"),
-      JSON.stringify({ name: "openclaw", version }),
+      JSON.stringify({ name, version }),
       "utf-8",
     );
   }
@@ -295,7 +295,7 @@ describe("runGatewayUpdate", () => {
       "pnpm install": { stdout: "" },
       "pnpm build": { stdout: "" },
       "pnpm ui:build": { stdout: "" },
-      [`${doctorNodePath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive --fix`]: {
+      [`${doctorNodePath} ${path.join(tempDir, "nightclaw.mjs")} doctor --non-interactive --fix`]: {
         stdout: "",
       },
     });
@@ -332,10 +332,12 @@ describe("runGatewayUpdate", () => {
     expectedInstallCommand: string;
     channel?: "stable" | "beta";
     tag?: string;
+    packageName?: string;
   }): Promise<{ calls: string[]; result: Awaited<ReturnType<typeof runGatewayUpdate>> }> {
+    const name = params.packageName ?? "openclaw";
     const nodeModules = path.join(tempDir, "node_modules");
-    const pkgRoot = path.join(nodeModules, "openclaw");
-    await seedGlobalPackageRoot(pkgRoot);
+    const pkgRoot = path.join(nodeModules, name);
+    await seedGlobalPackageRoot(pkgRoot, "1.0.0", name);
 
     const { calls, runCommand } = createGlobalInstallHarness({
       pkgRoot,
@@ -344,7 +346,7 @@ describe("runGatewayUpdate", () => {
       onInstall: async () => {
         await fs.writeFile(
           path.join(pkgRoot, "package.json"),
-          JSON.stringify({ name: "openclaw", version: "2.0.0" }),
+          JSON.stringify({ name, version: "2.0.0" }),
           "utf-8",
         );
       },
@@ -392,16 +394,16 @@ describe("runGatewayUpdate", () => {
 
   it.each([
     {
-      title: "updates global npm installs when detected",
+      title: "updates global npm installs when detected (openclaw fallback)",
       expectedInstallCommand: "npm i -g openclaw@latest --no-fund --no-audit --loglevel=error",
     },
     {
-      title: "uses update channel for global npm installs when tag is omitted",
+      title: "uses update channel for global npm installs when tag is omitted (openclaw fallback)",
       expectedInstallCommand: "npm i -g openclaw@beta --no-fund --no-audit --loglevel=error",
       channel: "beta" as const,
     },
     {
-      title: "updates global npm installs with tag override",
+      title: "updates global npm installs with tag override (openclaw fallback)",
       expectedInstallCommand: "npm i -g openclaw@beta --no-fund --no-audit --loglevel=error",
       tag: "beta",
     },
@@ -410,6 +412,45 @@ describe("runGatewayUpdate", () => {
       expectedInstallCommand,
       channel,
       tag,
+    });
+
+    expect(result.status).toBe("ok");
+    expect(result.mode).toBe("npm");
+    expect(result.before?.version).toBe("1.0.0");
+    expect(result.after?.version).toBe("2.0.0");
+    expect(calls.some((call) => call === expectedInstallCommand)).toBe(true);
+  });
+
+  it.each([
+    {
+      title: "installs nightclaw from GitHub repo (stable/latest channel)",
+      expectedInstallCommand:
+        "npm i -g github:r1skarctic/nightclaw --no-fund --no-audit --loglevel=error",
+    },
+    {
+      title: "installs nightclaw from GitHub beta branch",
+      expectedInstallCommand:
+        "npm i -g github:r1skarctic/nightclaw#beta --no-fund --no-audit --loglevel=error",
+      channel: "beta" as const,
+    },
+    {
+      title: "installs nightclaw from GitHub with specific version tag",
+      expectedInstallCommand:
+        "npm i -g github:r1skarctic/nightclaw#v2026.3.3 --no-fund --no-audit --loglevel=error",
+      tag: "v2026.3.3",
+    },
+    {
+      title: "installs nightclaw from GitHub main branch for dev channel",
+      expectedInstallCommand:
+        "npm i -g github:r1skarctic/nightclaw#main --no-fund --no-audit --loglevel=error",
+      tag: "dev",
+    },
+  ])("$title", async ({ expectedInstallCommand, channel, tag }) => {
+    const { calls, result } = await runNpmGlobalUpdateCase({
+      expectedInstallCommand,
+      channel,
+      tag,
+      packageName: "nightclaw",
     });
 
     expect(result.status).toBe("ok");
@@ -522,9 +563,9 @@ describe("runGatewayUpdate", () => {
     expect(calls.some((call) => call.includes("status --porcelain"))).toBe(false);
   });
 
-  it("fails with a clear reason when openclaw.mjs is missing", async () => {
+  it("fails with a clear reason when nightclaw.mjs is missing", async () => {
     await setupGitCheckout({ packageManager: "pnpm@8.0.0" });
-    await fs.rm(path.join(tempDir, "openclaw.mjs"), { force: true });
+    await fs.rm(path.join(tempDir, "nightclaw.mjs"), { force: true });
 
     const stableTag = "v1.0.1-1";
     const { runner } = createRunner({
@@ -538,7 +579,7 @@ describe("runGatewayUpdate", () => {
 
     expect(result.status).toBe("error");
     expect(result.reason).toBe("doctor-entry-missing");
-    expect(result.steps.at(-1)?.name).toBe("openclaw doctor entry");
+    expect(result.steps.at(-1)?.name).toBe("nightclaw doctor entry");
   });
 
   it("repairs UI assets when doctor run removes control-ui files", async () => {

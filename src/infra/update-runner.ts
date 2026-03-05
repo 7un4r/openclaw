@@ -85,8 +85,10 @@ const DEFAULT_TIMEOUT_MS = 20 * 60_000;
 const MAX_LOG_CHARS = 8000;
 const PREFLIGHT_MAX_COMMITS = 10;
 const START_DIRS = ["cwd", "argv1", "process"];
-const DEFAULT_PACKAGE_NAME = "openclaw";
-const CORE_PACKAGE_NAMES = new Set([DEFAULT_PACKAGE_NAME]);
+const DEFAULT_PACKAGE_NAME = "nightclaw";
+const CORE_PACKAGE_NAMES = new Set([DEFAULT_PACKAGE_NAME, "openclaw"]);
+// GitHub repository used for git-based installs and updates.
+const GITHUB_REPO = "r1skarctic/nightclaw";
 
 function normalizeDir(value?: string | null) {
   if (!value) {
@@ -314,7 +316,32 @@ function managerInstallArgs(manager: "pnpm" | "bun" | "npm") {
 }
 
 function normalizeTag(tag?: string) {
-  return normalizePackageTagInput(tag, ["openclaw", DEFAULT_PACKAGE_NAME]) ?? "latest";
+  return normalizePackageTagInput(tag, ["nightclaw", "openclaw", DEFAULT_PACKAGE_NAME]) ?? "latest";
+}
+
+/**
+ * Build the npm install spec for a global update.
+ * For the NightClaw package, always install from the GitHub repo so that
+ * updates are sourced from the fork (not from npmjs). For legacy/openclaw
+ * installs, fall back to the classic `<name>@<tag>` npmjs format.
+ */
+function buildInstallSpec(packageName: string, tag: string): string {
+  if (packageName === DEFAULT_PACKAGE_NAME) {
+    // Map npm dist-tags to git refs on the NightClaw GitHub repo.
+    //   latest / stable → HEAD of default branch (no ref suffix)
+    //   dev             → main branch
+    //   beta            → beta branch
+    //   vX.Y.Z          → specific release tag
+    if (tag === "latest" || tag === "stable") {
+      return `github:${GITHUB_REPO}`;
+    }
+    if (tag === "dev") {
+      return `github:${GITHUB_REPO}#main`;
+    }
+    return `github:${GITHUB_REPO}#${tag}`;
+  }
+  // Fallback for legacy openclaw global installs and unknown packages.
+  return `${packageName}@${tag}`;
 }
 
 export async function runGatewayUpdate(opts: UpdateRunnerOptions = {}): Promise<UpdateRunResult> {
@@ -740,14 +767,19 @@ export async function runGatewayUpdate(opts: UpdateRunnerOptions = {}): Promise<
       };
     }
 
-    const doctorEntry = path.join(gitRoot, "openclaw.mjs");
+    // Try nightclaw.mjs first; fall back to openclaw.mjs for source checkouts that haven't been renamed.
+    const doctorEntry =
+      (await fs
+        .stat(path.join(gitRoot, "nightclaw.mjs"))
+        .then(() => path.join(gitRoot, "nightclaw.mjs"))
+        .catch(() => null)) ?? path.join(gitRoot, "openclaw.mjs");
     const doctorEntryExists = await fs
       .stat(doctorEntry)
       .then(() => true)
       .catch(() => false);
     if (!doctorEntryExists) {
       steps.push({
-        name: "openclaw doctor entry",
+        name: "nightclaw doctor entry",
         command: `verify ${doctorEntry}`,
         cwd: gitRoot,
         durationMs: 0,
@@ -770,7 +802,7 @@ export async function runGatewayUpdate(opts: UpdateRunnerOptions = {}): Promise<
     const doctorNodePath = await resolveStableNodePath(process.execPath);
     const doctorArgv = [doctorNodePath, doctorEntry, "doctor", "--non-interactive", "--fix"];
     const doctorStep = await runStep(
-      step("openclaw doctor", doctorArgv, gitRoot, { OPENCLAW_UPDATE_IN_PROGRESS: "1" }),
+      step("nightclaw doctor", doctorArgv, gitRoot, { OPENCLAW_UPDATE_IN_PROGRESS: "1" }),
     );
     steps.push(doctorStep);
 
@@ -868,7 +900,7 @@ export async function runGatewayUpdate(opts: UpdateRunnerOptions = {}): Promise<
     });
     const channel = opts.channel ?? DEFAULT_PACKAGE_CHANNEL;
     const tag = normalizeTag(opts.tag ?? channelToNpmTag(channel));
-    const spec = `${packageName}@${tag}`;
+    const spec = buildInstallSpec(packageName, tag);
     const steps: UpdateStepResult[] = [];
     const updateStep = await runStep({
       runCommand,
