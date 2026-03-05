@@ -20,6 +20,7 @@ const resolveGatewayInstallToken = vi.hoisted(() =>
     warnings: [],
   })),
 );
+const isSystemdUserServiceAvailable = vi.hoisted(() => vi.fn(async () => true));
 
 vi.mock("../commands/onboard-helpers.js", () => ({
   detectBrowserOpenSupport: vi.fn(async () => ({ ok: false })),
@@ -65,7 +66,7 @@ vi.mock("../daemon/service.js", () => ({
 }));
 
 vi.mock("../daemon/systemd.js", () => ({
-  isSystemdUserServiceAvailable: vi.fn(async () => false),
+  isSystemdUserServiceAvailable,
 }));
 
 vi.mock("../infra/control-ui-assets.js", () => ({
@@ -102,6 +103,8 @@ describe("finalizeOnboardingWizard", () => {
     buildGatewayInstallPlan.mockClear();
     gatewayServiceInstall.mockClear();
     resolveGatewayInstallToken.mockClear();
+    isSystemdUserServiceAvailable.mockReset();
+    isSystemdUserServiceAvailable.mockResolvedValue(true);
   });
 
   it("resolves gateway password SecretRef for probe and TUI", async () => {
