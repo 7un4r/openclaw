@@ -66,6 +66,7 @@ function isGatewayArgv(args: string[]): boolean {
   const entryCandidates = [
     "dist/index.js",
     "dist/entry.js",
+    "nightclaw.mjs",
     "openclaw.mjs",
     "scripts/run-node.mjs",
     "src/index.ts",
@@ -75,7 +76,8 @@ function isGatewayArgv(args: string[]): boolean {
   }
 
   const exe = normalized[0] ?? "";
-  return exe.endsWith("/openclaw") || exe === "openclaw";
+  const knownBinaryNames = ["nightclaw", "openclaw"];
+  return knownBinaryNames.some((name) => exe === name || exe.endsWith(`/${name}`));
 }
 
 function readLinuxCmdline(pid: number): string[] | null {
