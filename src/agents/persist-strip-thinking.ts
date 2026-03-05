@@ -20,7 +20,7 @@ export function stripThinkingSignatureForPersistence(message: AgentMessage): Age
 
   let changed = false;
   const nextContent = assistant.content.map((block) => {
-    const b = block as Record<string, unknown>;
+    const b = block as unknown as Record<string, unknown>;
     if (
       b["type"] !== "thinking" ||
       typeof b["thinking"] !== "string" ||
@@ -33,7 +33,7 @@ export function stripThinkingSignatureForPersistence(message: AgentMessage): Age
     }
     changed = true;
     const { thinkingSignature: _dropped, ...rest } = b;
-    return rest as typeof block;
+    return rest as unknown as typeof block;
   });
 
   if (!changed) {
