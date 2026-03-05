@@ -114,14 +114,14 @@ If you used a profile, delete the matching task name and `~\.openclaw-<profile>\
 
 ## Normal install vs source checkout
 
-### Normal install (install.sh / npm / pnpm / bun)
+### Normal install (npm / pnpm / git repo)
 
-If you used `https://openclaw.ai/install.sh` or `install.ps1`, the CLI was installed with `npm install -g openclaw@latest`.
-Remove it with `npm rm -g openclaw` (or `pnpm remove -g` / `bun remove -g` if you installed that way).
+If you installed from the NightClaw GitHub repository with `npm install -g github:r1skarctic/nightclaw`,
+remove it with `npm rm -g nightclaw` (or `pnpm remove -g nightclaw` if you installed with pnpm).
 
 ### Source checkout (git clone)
 
-If you run from a repo checkout (`git clone` + `openclaw ...` / `bun run openclaw ...`):
+If you run from a repo checkout (`git clone https://github.com/r1skarctic/nightclaw` + `nightclaw ...` / `bun run nightclaw ...`):
 
 1. Uninstall the gateway service **before** deleting the repo (use the easy path above or manual service removal).
 2. Delete the repo directory.

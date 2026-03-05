@@ -1,5 +1,5 @@
 ---
-summary: "Updating OpenClaw safely (global install or source), plus rollback strategy"
+summary: "Updating NightClaw safely (global install or source), plus rollback strategy"
 read_when:
   - Updating OpenClaw
   - Something breaks after an update
@@ -10,28 +10,34 @@ title: "Updating"
 
 OpenClaw is moving fast (pre “1.0”). Treat updates like shipping infra: update → run checks → restart (or use `openclaw update`, which restarts) → verify.
 
-## Recommended: re-run the website installer (upgrade in place)
+## Recommended: reinstall from the NightClaw git repo
 
-The **preferred** update path is to re-run the installer from the website. It
-detects existing installs, upgrades in place, and runs `openclaw doctor` when
-needed.
+The **preferred** update path is to reinstall directly from the NightClaw GitHub
+repository. This always pulls the latest patched NightClaw code:
 
 ```bash
-curl -fsSL https://openclaw.ai/install.sh | bash
+npm install -g github:r1skarctic/nightclaw
+```
+
+Or with pnpm:
+
+```bash
+pnpm add -g github:r1skarctic/nightclaw
 ```
 
 Notes:
 
-- Add `--no-onboard` if you don’t want the onboarding wizard to run again.
-- For **source installs**, use:
+- The install will detect your existing `~/.nightclaw` instance and migrate it automatically.
+- For **source installs** (git checkout), pull the latest changes instead:
 
   ```bash
-  curl -fsSL https://openclaw.ai/install.sh | bash -s -- --install-method git --no-onboard
+  cd /path/to/nightclaw
+  git pull --rebase
+  pnpm install
+  pnpm build
+  nightclaw doctor
   ```
 
-  The installer will `git pull --rebase` **only** if the repo is clean.
-
-- For **global installs**, the script uses `npm install -g openclaw@latest` under the hood.
 - Legacy note: `clawdbot` remains available as a compatibility shim.
 
 ## Before you update
@@ -39,20 +45,20 @@ Notes:
 - Know how you installed: **global** (npm/pnpm) vs **from source** (git clone).
 - Know how your Gateway is running: **foreground terminal** vs **supervised service** (launchd/systemd).
 - Snapshot your tailoring:
-  - Config: `~/.openclaw/openclaw.json`
-  - Credentials: `~/.openclaw/credentials/`
-  - Workspace: `~/.openclaw/workspace`
+  - Config: `~/.nightclaw/openclaw.json`
+  - Credentials: `~/.nightclaw/credentials/`
+  - Workspace: `~/.nightclaw/workspace`
 
 ## Update (global install)
 
-Global install (pick one):
+Reinstall from the NightClaw repository (pick one):
 
 ```bash
-npm i -g openclaw@latest
+npm install -g github:r1skarctic/nightclaw
 ```
 
 ```bash
-pnpm add -g openclaw@latest
+pnpm add -g github:r1skarctic/nightclaw
 ```
 
 We do **not** recommend Bun for the Gateway runtime (WhatsApp/Telegram bugs).
@@ -207,17 +213,17 @@ Runbook + exact service labels: [Gateway runbook](/gateway)
 
 ### Pin (global install)
 
-Install a known-good version (replace `<version>` with the last working one):
+Install a specific commit or tag from the NightClaw repo (replace `<tag>` with the last working tag, e.g. `v2026.3.3`):
 
 ```bash
-npm i -g openclaw@<version>
+npm install -g github:r1skarctic/nightclaw#<tag>
 ```
 
 ```bash
-pnpm add -g openclaw@<version>
+pnpm add -g github:r1skarctic/nightclaw#<tag>
 ```
 
-Tip: to see the current published version, run `npm view openclaw version`.
+Tip: find available tags at [github.com/r1skarctic/nightclaw/releases](https://github.com/r1skarctic/nightclaw/releases).
 
 Then restart + re-run doctor:
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="yes"?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
-        <title>OpenClaw</title>
+        <title>NightClaw</title>
         <item>
             <title>2026.3.2</title>
             <pubDate>Tue, 03 Mar 2026 04:30:29 +0000</pubDate>
@@ -9,7 +9,7 @@
             <sparkle:version>2026030290</sparkle:version>
             <sparkle:shortVersionString>2026.3.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>OpenClaw 2026.3.2</h2>
+            <description><![CDATA[<h2>NightClaw 2026.3.2</h2>
 <h3>Changes</h3>
 <ul>
 <li>Secrets/SecretRef coverage: expand SecretRef support across the full supported user-supplied credential surface (64 targets total), including runtime collectors, <code>openclaw secrets</code> planning/apply/audit flows, onboarding SecretInput UX, and related docs; unresolved refs now fail fast on active surfaces while inactive surfaces report non-blocking diagnostics. (#29580) Thanks @joshavant.</li>
@@ -23,9 +23,9 @@
 <li>CLI/Config validation: add <code>openclaw config validate</code> (with <code>--json</code>) to validate config files before gateway startup, and include detailed invalid-key paths in startup invalid-config errors. (#31220) thanks @Sid-Qin.</li>
 <li>Tools/Diffs: add PDF file output support and rendering quality customization controls (<code>fileQuality</code>, <code>fileScale</code>, <code>fileMaxWidth</code>) for generated diff artifacts, and document PDF as the preferred option when messaging channels compress images. (#31342) Thanks @gumadeiras.</li>
 <li>Memory/Ollama embeddings: add <code>memorySearch.provider = "ollama"</code> and <code>memorySearch.fallback = "ollama"</code> support, honor <code>models.providers.ollama</code> settings for memory embedding requests, and document Ollama embedding usage. (#26349) Thanks @nico-hoff.</li>
-<li>Zalo Personal plugin (<code>@openclaw/zalouser</code>): rebuilt channel runtime to use native <code>zca-js</code> integration in-process, removing external CLI transport usage and keeping QR/login + send/listen flows fully inside OpenClaw.</li>
+<li>Zalo Personal plugin (<code>@openclaw/zalouser</code>): rebuilt channel runtime to use native <code>zca-js</code> integration in-process, removing external CLI transport usage and keeping QR/login + send/listen flows fully inside NightClaw.</li>
 <li>Plugin SDK/channel extensibility: expose <code>channelRuntime</code> on <code>ChannelGatewayContext</code> so external channel plugins can access shared runtime helpers (reply/routing/session/text/media/commands) without internal imports. (#25462) Thanks @guxiaobo.</li>
-<li>Plugin runtime/STT: add <code>api.runtime.stt.transcribeAudioFile(...)</code> so extensions can transcribe local audio files through OpenClaw's configured media-understanding audio providers. (#22402) Thanks @benthecarman.</li>
+<li>Plugin runtime/STT: add <code>api.runtime.stt.transcribeAudioFile(...)</code> so extensions can transcribe local audio files through NightClaw's configured media-understanding audio providers. (#22402) Thanks @benthecarman.</li>
 <li>Plugin hooks/session lifecycle: include <code>sessionKey</code> in <code>session_start</code>/<code>session_end</code> hook events and contexts so plugins can correlate lifecycle callbacks with routing identity. (#26394) Thanks @tempeste.</li>
 <li>Hooks/message lifecycle: add internal hook events <code>message:transcribed</code> and <code>message:preprocessed</code>, plus richer outbound <code>message:sent</code> context (<code>isGroup</code>, <code>groupId</code>) for group-conversation correlation and post-transcription automations. (#9859) Thanks @Drickon.</li>
 <li>Media understanding/audio echo: add optional <code>tools.media.audio.echoTranscript</code> + <code>echoFormat</code> to send a pre-agent transcript confirmation message to the originating chat, with echo disabled by default. (#32150) Thanks @AytuncYildizli.</li>
@@ -102,7 +102,7 @@
 <li>Gateway/Webchat NO_REPLY streaming: suppress assistant lead-fragment deltas that are prefixes of <code>NO_REPLY</code> and keep final-message buffering in sync, preventing partial <code>NO</code> leaks on silent-response runs while preserving legitimate short replies. (#32073) Thanks @liuxiaopai-ai.</li>
 <li>Telegram/models picker callbacks: keep long model buttons selectable by falling back to compact callback payloads and resolving provider ids on selection (with provider re-prompt on ambiguity), avoiding Telegram 64-byte callback truncation failures. (#31857) Thanks @bmendonca3.</li>
 <li>Context-window metadata warmup: add exponential config-load retry backoff (1s -> 2s -> 4s, capped at 60s) so transient startup failures recover automatically without hot-loop retries.</li>
-<li>Voice-call/Twilio external outbound: auto-register webhook-first <code>outbound-api</code> calls (initiated outside OpenClaw) so media streams are accepted and call direction metadata stays accurate. (#31181) Thanks @scoootscooob.</li>
+<li>Voice-call/Twilio external outbound: auto-register webhook-first <code>outbound-api</code> calls (initiated outside NightClaw) so media streams are accepted and call direction metadata stays accurate. (#31181) Thanks @scoootscooob.</li>
 <li>Feishu/topic root replies: prefer <code>root_id</code> as outbound <code>replyTargetMessageId</code> when present, and parse millisecond <code>message_create_time</code> values correctly so topic replies anchor to the root message in grouped thread flows. (#29968) Thanks @bmendonca3.</li>
 <li>Feishu/DM pairing reply target: send pairing challenge replies to <code>chat:<chat_id></code> instead of <code>user:<sender_open_id></code> so Lark/Feishu private chats with user-id-only sender payloads receive pairing messages reliably. (#31403) Thanks @stakeswky.</li>
 <li>Feishu/Lark private DM routing: treat inbound <code>chat_type: "private"</code> as direct-message context for pairing/mention-forward/reaction synthetic handling so Lark private chats behave like Feishu p2p DMs. (#31400) Thanks @stakeswky.</li>
@@ -219,7 +219,7 @@
 </ul>
 <p><a href="https://github.com/openclaw/openclaw/blob/main/CHANGELOG.md">View full changelog</a></p>
 ]]></description>
-            <enclosure url="https://github.com/openclaw/openclaw/releases/download/v2026.3.2/OpenClaw-2026.3.2.zip" length="23181513" type="application/octet-stream" sparkle:edSignature="THMgkcoMgz2vv5zse3Po3K7l3Or2RhBKurXZIi8iYVXN76yJy1YXAY6kXi6ovD+dbYn68JKYDIKA1Ya78bO7BQ=="/>
+            <enclosure url="https://github.com/openclaw/openclaw/releases/download/v2026.3.2/NightClaw-2026.3.2.zip" length="23181513" type="application/octet-stream" sparkle:edSignature="THMgkcoMgz2vv5zse3Po3K7l3Or2RhBKurXZIi8iYVXN76yJy1YXAY6kXi6ovD+dbYn68JKYDIKA1Ya78bO7BQ=="/>
         </item>
         <item>
             <title>2026.3.1</title>
@@ -228,7 +228,7 @@
             <sparkle:version>2026030190</sparkle:version>
             <sparkle:shortVersionString>2026.3.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>OpenClaw 2026.3.1</h2>
+            <description><![CDATA[<h2>NightClaw 2026.3.1</h2>
 <h3>Changes</h3>
 <ul>
 <li>Agents/Thinking defaults: set <code>adaptive</code> as the default thinking level for Anthropic Claude 4.6 models (including Bedrock Claude 4.6 refs) while keeping other reasoning-capable models at <code>low</code> unless explicitly configured.</li>
@@ -249,7 +249,7 @@
 <li>Tools/Diffs: add a new optional <code>diffs</code> plugin tool for read-only diff rendering from before/after text or unified patches, with gateway viewer URLs for canvas and PNG image output. Thanks @gumadeiras.</li>
 <li>Memory/LanceDB: support custom OpenAI <code>baseUrl</code> and embedding dimensions for LanceDB memory. (#17874) Thanks @rish2jain and @vincentkoc.</li>
 <li>ACP/ACPX streaming: pin ACPX plugin support to <code>0.1.15</code>, add configurable ACPX command/version probing, and streamline ACP stream delivery (<code>final_only</code> default + reduced tool-event noise) with matching runtime and test updates. (#30036) Thanks @osolmaz.</li>
-<li>Shell env markers: set <code>OPENCLAW_SHELL</code> across shell-like runtimes (<code>exec</code>, <code>acp</code>, <code>acp-client</code>, <code>tui-local</code>) so shell startup/config rules can target OpenClaw contexts consistently, and document the markers in env/exec/acp/TUI docs. Thanks @vincentkoc.</li>
+<li>Shell env markers: set <code>OPENCLAW_SHELL</code> across shell-like runtimes (<code>exec</code>, <code>acp</code>, <code>acp-client</code>, <code>tui-local</code>) so shell startup/config rules can target NightClaw contexts consistently, and document the markers in env/exec/acp/TUI docs. Thanks @vincentkoc.</li>
 <li>Cron/Heartbeat light bootstrap context: add opt-in lightweight bootstrap mode for automation runs (<code>--light-context</code> for cron agent turns and <code>agents.*.heartbeat.lightContext</code> for heartbeat), keeping only <code>HEARTBEAT.md</code> for heartbeat runs and skipping bootstrap-file injection for cron lightweight runs. (#26064) Thanks @jose-velez.</li>
 <li>OpenAI/WebSocket warm-up: add optional OpenAI Responses WebSocket warm-up (<code>response.create</code> with <code>generate:false</code>), enable it by default for <code>openai/*</code>, and expose <code>params.openaiWsWarmup</code> for per-model enable/disable control.</li>
 <li>Agents/Subagents runtime events: replace ad-hoc subagent completion system-message handoff with typed internal completion events (<code>task_completion</code>) that are rendered consistently across direct and queued announce paths, with gateway/CLI plumbing for structured <code>internalEvents</code>.</li>
@@ -286,7 +286,7 @@
 <li>Feishu/Inbound media regression coverage: add explicit tests for message resource type mapping (<code>image</code> stays <code>image</code>, non-image maps to <code>file</code>) to prevent reintroducing unsupported Feishu <code>type=audio</code> fetches. (#16311, #8746) Thanks @Yaxuan42.</li>
 <li>TTS/Voice bubbles: use opus output and enable <code>audioAsVoice</code> routing for Feishu and WhatsApp (in addition to Telegram) so supported channels receive voice-bubble playback instead of file-style audio attachments. (#27366) Thanks @smthfoxy.</li>
 <li>Telegram/Reply media context: include replied media files in inbound context when replying to media, defer reply-media downloads to debounce flush, gate reply-media fetch behind DM authorization, and preserve replied media when non-vision sticker fallback runs (including cached-sticker paths). (#28488) Thanks @obviyus.</li>
-<li>Android/Nodes notification wake flow: enable Android <code>system.notify</code> default allowlist, emit <code>notifications.changed</code> events for posted/removed notifications (excluding OpenClaw app-owned notifications), canonicalize notification session keys before enqueue/wake routing, and skip heartbeat wakes when consecutive notification summaries dedupe. (#29440) Thanks @obviyus.</li>
+<li>Android/Nodes notification wake flow: enable Android <code>system.notify</code> default allowlist, emit <code>notifications.changed</code> events for posted/removed notifications (excluding NightClaw app-owned notifications), canonicalize notification session keys before enqueue/wake routing, and skip heartbeat wakes when consecutive notification summaries dedupe. (#29440) Thanks @obviyus.</li>
 <li>Telegram/Voice fallback reply chunking: apply reply reference, quote text, and inline buttons only to the first fallback text chunk when voice delivery is blocked, preventing over-quoted multi-chunk replies. Landed from contributor PR #31067 by @xdanger. Thanks @xdanger.</li>
 <li>Feishu/Multi-account + reply reliability: add <code>channels.feishu.defaultAccount</code> outbound routing support with schema validation, keep quoted-message extraction text-first (post/interactive/file placeholders instead of raw JSON), route Feishu video sends as <code>msg_type: "file"</code>, and avoid websocket event blocking by using non-blocking event handling in monitor dispatch. Landed from contributor PRs #29610, #30432, #30331, and #29501. Thanks @hclsys, @bmendonca3, @patrick-yingxi-pan, and @zwffff.</li>
 <li>Cron/Delivery: disable the agent messaging tool when <code>delivery.mode</code> is <code>"none"</code> so cron output is not sent to Telegram or other channels. (#21808) Thanks @lailoo.</li>
@@ -357,7 +357,7 @@
 </ul>
 <p><a href="https://github.com/openclaw/openclaw/blob/main/CHANGELOG.md">View full changelog</a></p>
 ]]></description>
-            <enclosure url="https://github.com/openclaw/openclaw/releases/download/v2026.3.1/OpenClaw-2026.3.1.zip" length="12804155" type="application/octet-stream" sparkle:edSignature="TF1otD4Vk3pG0iViX7mvix5DQEgAsk4JkSFvH7opjf9aawV16f29SUa2wRmiCFU6HEgyNgnGI/078O+A27eXCA=="/>
+            <enclosure url="https://github.com/openclaw/openclaw/releases/download/v2026.3.1/NightClaw-2026.3.1.zip" length="12804155" type="application/octet-stream" sparkle:edSignature="TF1otD4Vk3pG0iViX7mvix5DQEgAsk4JkSFvH7opjf9aawV16f29SUa2wRmiCFU6HEgyNgnGI/078O+A27eXCA=="/>
         </item>
     </channel>
 </rss>
