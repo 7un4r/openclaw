@@ -7,8 +7,8 @@
  *   bun scripts/strip-thinking-signature.ts ~/.openclaw/agents/main/sessions/*.jsonl
  *
  * For every line in each file, any assistant message content block of type "thinking"
- * that carries human-readable plaintext (`thinking` is a non-empty string) has its
- * `thinkingSignature` field removed.  Blocks without plaintext are left untouched.
+ * that carries a `thinkingSignature` field has it removed — regardless of whether the
+ * `thinking` text is populated, empty, or absent.
  * Files are overwritten in place only when changes are found.
  *
  * Output example:
@@ -24,7 +24,7 @@ function stripThinkingSignatureFromBlock(block: unknown): { block: unknown; chan
     return { block, changed: false };
   }
   const b = block as Record<string, unknown>;
-  if (b["type"] !== "thinking" || typeof b["thinking"] !== "string" || b["thinking"].length === 0) {
+  if (b["type"] !== "thinking") {
     return { block, changed: false };
   }
   if (!("thinkingSignature" in b)) {
