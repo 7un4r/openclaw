@@ -1,0 +1,136 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - "**/*.mdx"
+      - ".agents/**"
+      - "skills/**"
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: blacksmith-16vcpu-ubuntu-2404
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Setup Node environment
+        uses: ./.github/actions/setup-node-env
+        with:
+          install-bun: "false"
+          use-sticky-disk: "true"
+
+      - name: Generate CalVer version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          DATE=$(date -u +%Y.%-m.%-d)
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          VERSION="${DATE}-${SHORT_SHA}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Generated version: ${VERSION}"
+
+      - name: Build
+        shell: bash
+        run: |
+          set -euo pipefail
+          if pnpm build && pnpm ui:build; then
+            echo "Full build succeeded"
+          else
+            echo "::warning::Full build failed, falling back to build:strict-smoke"
+            pnpm build:strict-smoke
+          fi
+
+      - name: Commit dist back to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f dist/
+          if git diff --cached --quiet; then
+            echo "dist/ unchanged, nothing to commit"
+          else
+            git commit -m "chore: update dist [skip ci]"
+            git pull --rebase origin main
+            git push origin main
+          fi
+
+      - name: Update package.json version for release tarball
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          jq --arg v "$VERSION" '.version = $v' package.json > package.json.tmp
+          mv package.json.tmp package.json
+          echo "Set package.json version to ${VERSION} for packing"
+
+      - name: Pack tarball
+        id: pack
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm pack --pack-destination .
+          TGZ=$(find . -maxdepth 1 -name 'nightclaw-*.tgz' -print -quit)
+          if [[ -z "$TGZ" ]]; then
+            echo "::error::pnpm pack did not produce a nightclaw-*.tgz file"
+            exit 1
+          fi
+          echo "tarball=${TGZ}" >> "$GITHUB_OUTPUT"
+          echo "Packed: ${TGZ}"
+
+      - name: Write release notes
+        shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          cat > /tmp/release-notes.md <<ENDBODY
+          Auto-generated pre-release from \`main\` at commit \`${GITHUB_SHA}\`.
+
+          ## Install
+
+          \`\`\`sh
+          # Always latest from main
+          bun install -g github:${GITHUB_REPOSITORY}
+          npm install -g github:${GITHUB_REPOSITORY}
+          pnpm add -g github:${GITHUB_REPOSITORY}
+
+          # Pinned to this release
+          bun install -g https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/nightclaw-${VERSION}.tgz
+          npm install -g https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/nightclaw-${VERSION}.tgz
+          pnpm add -g https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/nightclaw-${VERSION}.tgz
+          \`\`\`
+          ENDBODY
+
+      - name: Create GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+          TAG: ${{ steps.version.outputs.tag }}
+          TARBALL: ${{ steps.pack.outputs.tarball }}
+        run: |
+          set -euo pipefail
+          gh release create "${TAG}" \
+            --title "nightclaw v${VERSION}" \
+            --notes-file /tmp/release-notes.md \
+            --prerelease \
+            "${TARBALL}"
