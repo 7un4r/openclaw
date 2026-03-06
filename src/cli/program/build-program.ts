@@ -16,5 +16,9 @@ export function buildProgram() {
 
   registerProgramCommands(program, ctx, argv);
 
+  program.action(() => {
+    program.outputHelp();
+  });
+
   return program;
 }
