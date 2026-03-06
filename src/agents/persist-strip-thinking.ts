@@ -4,10 +4,9 @@ import type { AgentMessage } from "@mariozechner/pi-agent-core";
  * Strip `thinkingSignature` from thinking content blocks in an assistant message
  * before it is persisted to the session transcript.
  *
- * Only removes the signature when the block carries human-readable plaintext
- * (`thinking` is a non-empty string). Blocks without plaintext (e.g. encrypted /
- * binary-only blobs) are left untouched so providers that rely on the opaque
- * signature can still replay them correctly.
+ * Removes the signature from every block whose `type` is `"thinking"` and that
+ * carries a `thinkingSignature` field — regardless of whether the `thinking` text
+ * is populated, empty, or absent.
  */
 export function stripThinkingSignatureForPersistence(message: AgentMessage): AgentMessage {
   if ((message as { role?: unknown }).role !== "assistant") {
@@ -21,11 +20,7 @@ export function stripThinkingSignatureForPersistence(message: AgentMessage): Age
   let changed = false;
   const nextContent = assistant.content.map((block) => {
     const b = block as unknown as Record<string, unknown>;
-    if (
-      b["type"] !== "thinking" ||
-      typeof b["thinking"] !== "string" ||
-      b["thinking"].length === 0
-    ) {
+    if (b["type"] !== "thinking") {
       return block;
     }
     if (!("thinkingSignature" in b)) {

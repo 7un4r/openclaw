@@ -78,7 +78,7 @@ describe("stripThinkingSignatureForPersistence", () => {
     expect(block?.["thinkingSignature"]).toBe("encrypted-sig");
   });
 
-  it("does NOT strip thinkingSignature when thinking text is an empty string", () => {
+  it("strips thinkingSignature when thinking text is an empty string", () => {
     const msg: AgentMessage = {
       role: "assistant",
       content: [{ type: "thinking", thinking: "", thinkingSignature: "sig" }],
@@ -86,7 +86,7 @@ describe("stripThinkingSignatureForPersistence", () => {
     } as any;
     const result = stripThinkingSignatureForPersistence(msg);
     const content = (result as { content: Array<Record<string, unknown>> }).content;
-    expect(content[0]?.["thinkingSignature"]).toBe("sig");
+    expect("thinkingSignature" in (content[0] ?? {})).toBe(false);
   });
 
   it("passes through non-assistant messages unchanged", () => {
@@ -131,7 +131,7 @@ describe("installSessionToolResultGuard – thinkingSignature stripped on persis
     expect("thinkingSignature" in (thinkingBlock ?? {})).toBe(false);
   });
 
-  it("preserves encrypted-only thinking blocks without plaintext", () => {
+  it("preserves blocks without type:'thinking' even if they carry thinkingSignature", () => {
     const sm = SessionManager.inMemory();
     installSessionToolResultGuard(sm, {
       transformMessageForPersistence: stripThinkingSignatureForPersistence,
@@ -140,8 +140,10 @@ describe("installSessionToolResultGuard – thinkingSignature stripped on persis
     const encryptedBlock: AgentMessage = {
       role: "assistant",
       content: [
-        // No "thinking" text field — should be left alone
+        // No type field — should be left alone
         { thinkingSignature: "opaque-blob" } as unknown,
+        // type:'text' with a spurious thinkingSignature — should also be left alone
+        { type: "text", text: "hello", thinkingSignature: "spurious" } as unknown,
       ],
       // oxlint-disable-next-line typescript/no-explicit-any
     } as any;
@@ -150,6 +152,7 @@ describe("installSessionToolResultGuard – thinkingSignature stripped on persis
     const messages = getPersistedMessages(sm);
     const content = (messages[0] as { content: Array<Record<string, unknown>> }).content;
     expect(content[0]?.["thinkingSignature"]).toBe("opaque-blob");
+    expect(content[1]?.["thinkingSignature"]).toBe("spurious");
   });
 });
 
@@ -202,6 +205,32 @@ describe("processFile (disk scrubber)", () => {
     expect(block?.["thinking"]).toBe("plan");
   });
 
+  it("strips thinkingSignature from a thinking block with an empty thinking string", () => {
+    const file = writeTempJsonl([
+      {
+        type: "message",
+        message: {
+          role: "assistant",
+          content: [
+            { type: "thinking", thinking: "", thinkingSignature: "encrypted-blob" },
+            { type: "text", text: "answer" },
+          ],
+        },
+      },
+    ]);
+
+    const result = processFile(file);
+    expect(result.updated).toBe(true);
+    expect(result.blocksStripped).toBe(1);
+    expect(result.bytesSaved).toBeGreaterThan(0);
+
+    const lines = readJsonlLines(file);
+    const msgLine = lines[0] as { message: { content: Array<Record<string, unknown>> } };
+    const block = msgLine.message.content.find((b) => b["type"] === "thinking");
+    expect(block?.["thinkingSignature"]).toBeUndefined();
+    expect(block?.["thinking"]).toBe("");
+  });
+
   it("does not modify files without applicable thinking blocks", () => {
     const originalLines = [
       { type: "session", id: "sess2" },
@@ -226,13 +255,16 @@ describe("processFile (disk scrubber)", () => {
     expect(afterMtime).toBe(beforeMtime);
   });
 
-  it("skips encrypted-only thinking blocks (no plaintext)", () => {
+  it("skips blocks without type:'thinking' even if they carry thinkingSignature", () => {
     const file = writeTempJsonl([
       {
         type: "message",
         message: {
           role: "assistant",
-          content: [{ thinkingSignature: "opaque" }],
+          content: [
+            { thinkingSignature: "opaque" },
+            { type: "text", text: "hi", thinkingSignature: "spurious" },
+          ],
         },
       },
     ]);
@@ -244,6 +276,7 @@ describe("processFile (disk scrubber)", () => {
     const lines = readJsonlLines(file);
     const msg = lines[0] as { message: { content: Array<Record<string, unknown>> } };
     expect(msg.message.content[0]?.["thinkingSignature"]).toBe("opaque");
+    expect(msg.message.content[1]?.["thinkingSignature"]).toBe("spurious");
   });
 
   it("handles multiple blocks and multiple messages in one file", () => {
